@@ -29,6 +29,17 @@ function PurchaseTicketsPage() {
     availableSeats = [], 
     selectedSeats = [] 
   } = location.state || {};
+
+  // Include full ticket details in the cart
+  const initialCart = selectedSeats.map(seat => ({
+    user_id,
+    train_id,
+    departure_time,
+    arrival_time,
+    seat_number,
+    qr_code,
+    price,
+  }));
   
   const [cart, setCart] = useState(location.state?.cart || []);
   const [selectedPayment, setSelectedPayment] = useState("");
@@ -272,33 +283,13 @@ function PurchaseTicketsPage() {
         >
           <h2>Your Cart</h2>
           {cart.length > 0 ? (
-            cart.map((seat, index) => (
-              <div
-                key={index}
-                style={{
-                  backgroundColor: "#FEFEFE",
-                  color: "black",
-                  padding: "10px",
-                  margin: "10px 0",
-                  borderRadius: "5px",
-                }}
-              >
-                <h4>Train: {trainCode}</h4>
-                <p>
-                  <strong>{origin}</strong> → <strong>{destination}</strong>
-                </p>
-                <p>Seat: {seat}</p>
-                <button
-                  onClick={() => handleRemoveFromCart(index)}
-                  style={{
-                    backgroundColor: "#D9534F",
-                    color: "white",
-                    border: "none",
-                    padding: "5px 10px",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
-                >
+            cart.map((ticket, index) => (
+              <div key={index} style={{ backgroundColor: "#FEFEFE", color: "black", padding: "10px", margin: "10px 0", borderRadius: "5px" }}>
+                <h4>Train: {ticket.trainCode}</h4>
+                <p><strong>{ticket.origin}</strong> → <strong>{ticket.destination}</strong></p>
+                <p>Departure Time: {ticket.departureTime}</p>
+                <p>Seat: {ticket.seat}</p>
+                <button onClick={() => handleRemoveFromCart(index)} style={{ backgroundColor: "#D9534F", color: "white", border: "none", padding: "5px 10px", borderRadius: "5px", cursor: "pointer" }}>
                   Remove
                 </button>
               </div>
