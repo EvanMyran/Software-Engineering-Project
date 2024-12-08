@@ -39,7 +39,7 @@ function PurchaseTicketsPage() {
     seat
   }));
   
-  const [cart, setCart] = useState(location.state?.cart || []);
+  const [cart, setCart] = useState(initialCart);
   const [selectedPayment, setSelectedPayment] = useState("");
   const [paymentImage, setPaymentImage] = useState(null);
   const [cardNumber, setCardNumber] = useState("");
