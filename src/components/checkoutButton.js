@@ -7,31 +7,37 @@ const CheckoutButton = ({ cart, isCardValid, isCodeValid, isDateValid, selectedP
   const saveTicketsToDatabase = async () => {
   try {
     const user_id = req.session.user.userid;
-    const ticketsToSave = cart.map((ticket) => ({
-      trainId: ticket.trainId, // Add the train ID
-      departureTime: ticket.departureTime, // Add departure time
-      arrivalTime: ticket.arrivalTime, // Add arrival time
-      seatNumber: ticket.seatNumber, // Add seat number
-      qrCode: ticket.qrCode || null, // Generate or leave as null
-      price: ticket.price, // Add ticket price
-    }));
 
-    const response = await fetch('http://localhost:3000/api/save-tickets', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tickets: ticketsToSave, user_id }), // Add user ID
-    });
+    // Loop through each ticket in the cart and save it individually
+    for (const ticket of cart) {
+      const ticketData = {
+        user_id, // User ID
+        train_id: ticket.trainId, // Train ID
+        departure_time: ticket.departureTime, // Departure time
+        arrival_time: ticket.arrivalTime, // Arrival time
+        seat_number: ticket.seatNumber, // Seat number
+        qr_code: ticket.qrCode || null, // QR code (optional)
+        price: ticket.price, // Ticket price
+      };
 
-    if (!response.ok) {
-      throw new Error('Failed to save tickets.');
+      // Make API request for each ticket
+      const response = await fetch('http://localhost:3000/api/save-ticket', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(ticketData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to save ticket with train_id: ${ticket.trainId}`);
+      }
     }
 
-    console.log('Tickets saved successfully.');
+    console.log('All tickets saved successfully.');
   } catch (error) {
     console.error('Error saving tickets:', error.message);
   }
 };
-
+    
   const handleClick = async () => {
     console.log("Card Valid:", isCardValid);
     console.log("Code Valid:", isCodeValid);
