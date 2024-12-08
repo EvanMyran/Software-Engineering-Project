@@ -29,17 +29,8 @@ function PurchaseTicketsPage() {
     availableSeats = [], 
     selectedSeats = [] 
   } = location.state || {};
-
-  // Include full ticket details in the cart
-  const initialCart = selectedSeats.map(seat => ({
-    ticket.trainCode,
-    ticket.origin,
-    ticket.destination,
-    ticket.departureTime,
-    seat
-  }));
   
-  const [cart, setCart] = useState(initialCart);
+  const [cart, setCart] = useState(location.state?.cart || []);
   const [selectedPayment, setSelectedPayment] = useState("");
   const [paymentImage, setPaymentImage] = useState(null);
   const [cardNumber, setCardNumber] = useState("");
