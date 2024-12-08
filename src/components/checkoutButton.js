@@ -6,7 +6,7 @@ const CheckoutButton = ({ cart, isCardValid, isCodeValid, isDateValid, selectedP
 
   const saveTicketsToDatabase = async () => {
     try {
-      const response = await fetch(''http://localhost:3000/api/checkout', {
+      const response = await fetch('http://localhost:3000/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tickets: cart, userId }),
