@@ -5,22 +5,32 @@ const CheckoutButton = ({ cart, isCardValid, isCodeValid, isDateValid, selectedP
   const navigate = useNavigate();
 
   const saveTicketsToDatabase = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/api/save-tickets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tickets: cart, userId: sessionStorage.getItem('user_Id') }),
-      });
+  try {
+    const user_id = req.session.user.userid;
+    const ticketsToSave = cart.map((ticket) => ({
+      trainId: ticket.trainId, // Add the train ID
+      departureTime: ticket.departureTime, // Add departure time
+      arrivalTime: ticket.arrivalTime, // Add arrival time
+      seatNumber: ticket.seatNumber, // Add seat number
+      qrCode: ticket.qrCode || null, // Generate or leave as null
+      price: ticket.price, // Add ticket price
+    }));
 
-      if (!response.ok) {
-        throw new Error('Failed to save tickets.');
-      }
+    const response = await fetch('http://localhost:3000/api/save-tickets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tickets: ticketsToSave, user_id }), // Add user ID
+    });
 
-      console.log('Tickets saved successfully.');
-    } catch (error) {
-      console.error('Error saving tickets:', error.message);
+    if (!response.ok) {
+      throw new Error('Failed to save tickets.');
     }
-  };
+
+    console.log('Tickets saved successfully.');
+  } catch (error) {
+    console.error('Error saving tickets:', error.message);
+  }
+};
 
   const handleClick = async () => {
     console.log("Card Valid:", isCardValid);
