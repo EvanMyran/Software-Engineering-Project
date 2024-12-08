@@ -32,10 +32,10 @@ function PurchaseTicketsPage() {
 
   // Include full ticket details in the cart
   const initialCart = selectedSeats.map(seat => ({
-    trainCode,
-    origin,
-    destination,
-    departureTime,
+    ticket.trainCode,
+    ticket.origin,
+    ticket.destination,
+    ticket.departureTime,
     seat
   }));
   
