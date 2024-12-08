@@ -153,10 +153,13 @@ app.post('/api/login', (req, res) => {
   });
 }); // <-- Properly close this route
 
-// API Endpoint to save tickets
+
+// Ticket POST Request
 app.post('/api/save-tickets', (req, res) => {
   const { tickets, userId } = req.body;
-
+  console.log('Tickets:', tickets); // Debugging
+  console.log('User ID:', userId); // Debugging
+  
   if (!tickets || tickets.length === 0) {
     return res.status(400).json({ error: 'No tickets provided.' });
   }
@@ -185,6 +188,25 @@ app.post('/api/save-tickets', (req, res) => {
     res.status(500).json({ error: 'Failed to save tickets.' });
   }
 });
+
+// Ticket frontend request
+app.get('/api/get-tickets', (req, res) => {
+  const { userId } = req.query;
+
+  if (!userId) {
+    return res.status(400).json({ error: 'User ID is required.' });
+  }
+
+  db.all('SELECT * FROM Tickets WHERE user_id = ?', [userId], (err, rows) => {
+    if (err) {
+      console.error('Database Error:', err);
+      return res.status(500).json({ error: 'Failed to fetch tickets.' });
+    }
+
+    res.json(rows); // Send tickets to the frontend
+  });
+});
+
 
 // Start the server
 app.listen(port, () => {
