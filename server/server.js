@@ -155,13 +155,11 @@ app.post('/api/login', (req, res) => {
 
 
 // Ticket POST Request
-app.post('/api/save-tickets', (req, res) => {
-  const { tickets, userId } = req.body;
-  console.log('Tickets:', tickets); // Debugging
-  console.log('User ID:', userId); // Debugging
-  
-  if (!tickets || tickets.length === 0) {
-    return res.status(400).json({ error: 'No tickets provided.' });
+app.post('/api/save-ticket', (req, res) => {
+  const { user_id, train_id, departure_time, arrival_time, seat_number, qr_code, price } = req.body;
+
+  if (!user_id || !train_id || !departure_time || !arrival_time || !seat_number || !price) {
+    return res.status(400).json({ error: 'Missing required fields.' });
   }
 
   const stmt = db.prepare(`
@@ -170,22 +168,12 @@ app.post('/api/save-tickets', (req, res) => {
   `);
 
   try {
-    tickets.forEach(ticket => {
-      stmt.run(
-        userId,
-        ticket.trainId,
-        ticket.departureTime,
-        ticket.arrivalTime,
-        ticket.seatNumber,
-        ticket.qrCode,
-        ticket.price
-      );
-    });
+    stmt.run(user_id, train_id, departure_time, arrival_time, seat_number, qr_code, price);
     stmt.finalize();
-    res.status(200).json({ message: 'Tickets saved successfully.' });
+    res.status(200).json({ message: 'Ticket saved successfully.' });
   } catch (err) {
-    console.error('Error saving tickets:', err.message);
-    res.status(500).json({ error: 'Failed to save tickets.' });
+    console.error('Error saving ticket:', err.message);
+    res.status(500).json({ error: 'Failed to save ticket.' });
   }
 });
 
