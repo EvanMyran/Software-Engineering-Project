@@ -184,20 +184,35 @@ app.post('/api/save-tickets', async (req, res) => {
     return res.status(400).json({ error: 'No tickets provided.' });
   }
 
-  // Checking and inserting into the database
-  db.run(
-    `INSERT INTO Tickets (user_id, train_id, departure_time, arrival_time, seat_number, qr_code, price)
-    VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [user_id, train_id, departure_time, arrival_time, seat_number, qr_code, price],
-    (err) => {
-      if (err) {
-        console.error('Database Error:', err);
-        return res.status(500).json({ error: 'Failed to save tickets to the database.' });
-      }
-      res.status(201).json({ message: 'Tickets saved successfully.' });
-    }
-  );
+  // Iterate through tickets and insert them into the database
+  const insertPromises = tickets.map(ticket => {
+    const { train_id, departure_time, arrival_time, seat_number, qr_code, price } = ticket;
+    
+    return new Promise((resolve, reject) => {
+      db.run(
+        `INSERT INTO Tickets 
+          (user_id, train_id, departure_time, arrival_time, seat_number, qr_code, price) 
+          VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [userId, train_id, departure_time, arrival_time, seat_number, qr_code, price],
+        (err) => {
+          if (err) {
+            console.error('Database Error:', err);
+            return reject(err);
+          }
+          resolve();
+        }
+      );
+    });
+  });
+
+  try {
+    await Promise.all(insertPromises); // Wait for all inserts to complete
+    res.status(201).json({ message: 'Tickets saved successfully.' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to save tickets to the database.' });
+  }
 });
+
 
 // Start the server
 app.listen(port, () => {
