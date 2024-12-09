@@ -12,6 +12,7 @@ import paymentImage5 from "../assets/Mastercard-Logo.png"; // Example image
 import NavigationButton from "../components/navigationButton.js";
 import TrainDetails from '../components/trainDetails.js';
 import CheckoutButton from '../components/checkoutButton'; // Import the CheckoutButton
+import QRCode from '../components/QRCode.js';
 
 function PurchaseTicketsPage({ tickets, loading: ticketLoading, trains, setFilteredTrains, user }) {
   const location = useLocation();
@@ -40,7 +41,7 @@ function PurchaseTicketsPage({ tickets, loading: ticketLoading, trains, setFilte
   const [dateNumber, setDateNumber] = useState("");
   const [isDateValid, setIsDateValid] = useState(true);
 
-  const { currentUserId } = user.id; // Access currentUserId
+  const { currentUserId } = <QRCode userID={user.id}/>; // Access currentUserId
   const ticketCart = selectedSeats.map((seat) => ({
     userId: currentUserId, // Pass user ID explicitly
     trainId: trainCode, // Train code or ID
