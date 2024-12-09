@@ -40,6 +40,17 @@ function PurchaseTicketsPage() {
   const [dateNumber, setDateNumber] = useState("");
   const [isDateValid, setIsDateValid] = useState(true);
 
+  const ticketCart = selectedSeats.map((seat) => ({
+    userId: currentUserId, // Pass user ID explicitly
+    trainId: trainCode, // Train code or ID
+    departureTime: departureTime,
+    arrivalTime: arrivalTime,
+    seatNumber: seat, // Individual seat
+    qrCode: null, // Can be generated later
+    price: 19.99, // Example price
+  }));
+  setCart(ticketCart);
+
   // Utility function to get card issuer
   const getIssuer = (cardNumber) => {
     if (!cardNumber) return null;
@@ -314,6 +325,7 @@ function PurchaseTicketsPage() {
            
         <CheckoutButton 
             cart={cart} 
+            userId={currentUserId}
             isCardValid={isCardValid} 
             isCodeValid={isCodeValid} 
             isDateValid={isDateValid} 
