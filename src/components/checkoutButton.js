@@ -4,35 +4,25 @@ import { useNavigate } from 'react-router-dom';
 const CheckoutButton = ({ cart, isCardValid, isCodeValid, isDateValid, selectedPayment, userId }) => {
   const navigate = useNavigate();
 
-  const saveTicketsToDatabase = async () => {
-    try {
-      // Map cart items into Ticket objects or properly structured data
-      const ticketsToSave = cart.map((item) => ({
-        userId,
-        trainId: item.trainId,
-        departureTime: item.departureTime,
-        arrivalTime: item.arrivalTime,
-        seatNumber: item.seatNumber,
-        qrCode: null, // Set null or generate as needed
-        price: item.price,
-      }));
+ const saveTicketsToDatabase = async () => {
+  try {
+    const response = await fetch('http://localhost:3000/api/save-tickets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tickets: cart, userId }),
+    });
 
-      // Make API request to save tickets
-      const response = await fetch('http://localhost:3000/api/save-tickets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tickets: ticketsToSave }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save tickets.');
-      }
-
-      console.log('Tickets saved successfully.');
-    } catch (error) {
-      console.error('Error saving tickets:', error.message);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to save tickets.');
     }
-  };
+
+    console.log('Tickets saved successfully.');
+  } catch (error) {
+    console.error('Error saving tickets:', error.message);
+  }
+};
+
 
   const handleClick = async () => {
     if (!selectedPayment) {
