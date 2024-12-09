@@ -40,6 +40,7 @@ function PurchaseTicketsPage() {
   const [dateNumber, setDateNumber] = useState("");
   const [isDateValid, setIsDateValid] = useState(true);
 
+  const { currentUserId } = user.id; // Access currentUserId
   const ticketCart = selectedSeats.map((seat) => ({
     userId: currentUserId, // Pass user ID explicitly
     trainId: trainCode, // Train code or ID
