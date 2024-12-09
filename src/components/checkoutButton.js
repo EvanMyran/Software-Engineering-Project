@@ -1,15 +1,27 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const CheckoutButton = ({ cart, isCardValid, isCodeValid, isDateValid, selectedPayment }) => {
+const CheckoutButton = ({ cart, isCardValid, isCodeValid, isDateValid, selectedPayment, userId }) => {
   const navigate = useNavigate();
 
   const saveTicketsToDatabase = async () => {
     try {
-      const response = await fetch('/api/save-tickets', {
+      // Map cart items into Ticket objects or properly structured data
+      const ticketsToSave = cart.map((item) => ({
+        userId,
+        trainId: item.trainId,
+        departureTime: item.departureTime,
+        arrivalTime: item.arrivalTime,
+        seatNumber: item.seatNumber,
+        qrCode: null, // Set null or generate as needed
+        price: item.price,
+      }));
+
+      // Make API request to save tickets
+      const response = await fetch('http://localhost:3000/api/save-tickets', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tickets: cart, userId }),
+        body: JSON.stringify({ tickets: ticketsToSave }),
       });
 
       if (!response.ok) {
@@ -23,37 +35,22 @@ const CheckoutButton = ({ cart, isCardValid, isCodeValid, isDateValid, selectedP
   };
 
   const handleClick = async () => {
-    console.log("Card Valid:", isCardValid);
-    console.log("Code Valid:", isCodeValid);
-    console.log("Date Valid:", isDateValid);
-    console.log("Cart:", cart);
-    console.log("Selected Payment:", selectedPayment);
-  
     if (!selectedPayment) {
       alert("Please select a payment method.");
       return;
     }
     if (selectedPayment === "New Credit Card") {
-      if (!isCardValid) {
-        alert("Please enter a valid card number.");
-        return;
-      }
-      if (!isCodeValid) {
-        alert("Please enter a valid security code.");
-        return;
-      }
-      if (!isDateValid) {
-        alert("Please enter a valid expiration date.");
+      if (!isCardValid || !isCodeValid || !isDateValid) {
+        alert("Please enter valid payment details.");
         return;
       }
     }
     if (cart.length === 0) {
-      alert("Must have items in cart to checkout.");
+      alert("Your cart is empty.");
       return;
     }
-    // Save tickets to the database
+
     await saveTicketsToDatabase();
-  
     navigate("/success");
   };
 
