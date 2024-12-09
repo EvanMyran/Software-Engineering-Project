@@ -212,6 +212,27 @@ app.post('/api/save-tickets', (req, res) => {
 });
 
 
+// Get-tickets endpoint
+app.get('/api/get-tickets', (req, res) => {
+  const { userId } = req.query;
+
+  if (!userId) {
+    return res.status(400).json({ error: 'User ID is required.' });
+  }
+
+  db.all(
+    'SELECT * FROM Tickets WHERE user_id = ?',
+    [userId],
+    (err, rows) => {
+      if (err) {
+        console.error('Database Error:', err.message);
+        return res.status(500).json({ error: 'Failed to fetch tickets.' });
+      }
+      res.status(200).json(rows);
+    }
+  );
+});
+
 
 // Start the server
 app.listen(port, () => {
