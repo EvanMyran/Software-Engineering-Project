@@ -176,42 +176,41 @@ app.post('/api/change-password', (req, res) => {
   });
 });
 
-// API Endpoint to save tickets
-app.post('/api/save-tickets', async (req, res) => {
+
+// SAve tickets endpoint
+app.post('/api/save-tickets', (req, res) => {
   const { tickets, userId } = req.body;
 
   if (!tickets || tickets.length === 0) {
     return res.status(400).json({ error: 'No tickets provided.' });
   }
 
-  // Iterate through tickets and insert them into the database
-  const insertPromises = tickets.map(ticket => {
-    const { train_id, departure_time, arrival_time, seat_number, qr_code, price } = ticket;
-    
-    return new Promise((resolve, reject) => {
-      db.run(
-        `INSERT INTO Tickets 
-          (user_id, train_id, departure_time, arrival_time, seat_number, qr_code, price) 
-          VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [userId, train_id, departure_time, arrival_time, seat_number, qr_code, price],
-        (err) => {
-          if (err) {
-            console.error('Database Error:', err);
-            return reject(err);
-          }
-          resolve();
-        }
-      );
-    });
-  });
+  const stmt = db.prepare(`
+    INSERT INTO Tickets (user_id, train_id, departure_time, arrival_time, seat_number, qr_code, price)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `);
 
   try {
-    await Promise.all(insertPromises); // Wait for all inserts to complete
+    tickets.forEach((ticket) => {
+      stmt.run(
+        userId,
+        ticket.trainId,
+        ticket.departureTime,
+        ticket.arrivalTime,
+        ticket.seatNumber,
+        ticket.qrCode,
+        ticket.price
+      );
+    });
+
+    stmt.finalize();
     res.status(201).json({ message: 'Tickets saved successfully.' });
   } catch (error) {
+    console.error('Error saving tickets to the database:', error.message);
     res.status(500).json({ error: 'Failed to save tickets to the database.' });
   }
 });
+
 
 
 // Start the server
