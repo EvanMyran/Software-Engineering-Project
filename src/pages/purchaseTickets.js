@@ -13,7 +13,7 @@ import NavigationButton from "../components/navigationButton.js";
 import TrainDetails from '../components/trainDetails.js';
 import CheckoutButton from '../components/checkoutButton'; // Import the CheckoutButton
 
-function PurchaseTicketsPage() {
+function PurchaseTicketsPage({ user }) {
   const location = useLocation();
   const navigate = useNavigate();
   const ticket = location.state?.ticket; // Extract the ticket data
